@@ -24,17 +24,28 @@ const buttonVariants = cva(
   }
 );
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
-  href?: string;
+interface ButtonAsButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+  href?: undefined;
 }
 
+interface ButtonAsLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement>, VariantProps<typeof buttonVariants> {
+  href: string;
+}
+
+type ButtonProps = ButtonAsButtonProps | ButtonAsLinkProps;
+
 export default function Button({ className, variant, size, href, ...props }: ButtonProps) {
+  const commonClasses = cn(buttonVariants({ variant, size, className }));
+
   if (href) {
+    const linkProps = props as React.AnchorHTMLAttributes<HTMLAnchorElement>;
     return (
-      <Link href={href} className={cn(buttonVariants({ variant, size, className }))} {...props} />
+      <Link href={href} className={commonClasses} {...linkProps} />
+    );
+  } else {
+    const buttonProps = props as React.ButtonHTMLAttributes<HTMLButtonElement>;
+    return (
+      <button className={commonClasses} {...buttonProps} />
     );
   }
-  return (
-    <button className={cn(buttonVariants({ variant, size, className }))} {...props} />
-  );
 }
